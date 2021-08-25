@@ -1,0 +1,105 @@
+#Solution of https://www.codingame.com/ide/puzzle/rooks-movements
+
+rook_position = input()
+relevant_pieces = []
+nb_pieces = int(input())
+for i in range(nb_pieces):
+    inputs = input()
+    if inputs[2] == rook_position[0] or inputs[3] == rook_position[1]:
+        relevant_pieces.append(inputs)
+
+
+def rook_free_moves(rook_position):
+    rook_free_moves = []
+    helper_list = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+    for i in range(1, 9):
+        rook_free_moves.append(rook_position[0] + str(i))
+        x = i - 1
+        rook_free_moves.append(helper_list[x] + rook_position[1])
+    rook_free_moves.remove(rook_position)
+    rook_free_moves.remove(rook_position)
+    return sorted(rook_free_moves)
+
+
+def piece_borders(rook_position, relevant_pieces):
+    north = []
+    south = []
+    east = []
+    west = []
+    rook_move_border = []
+    for element in relevant_pieces:
+        if element[2] == rook_position[0]:
+            if element[3] > rook_position[1]:
+                north.append(element)
+            else:
+                south.append(element)
+        elif element[3] == rook_position[1]:
+            if element[2] > rook_position[0]:
+                east.append(element)
+            else:
+                west.append(element)
+
+    if len(north) != 0:
+        north = min(north)
+        rook_move_border.append('n' + north)
+    if len(south) != 0:
+        south = max(south)
+        rook_move_border.append('s' + south)
+    if len(east) != 0:
+        east = min(east)
+        rook_move_border.append('e' + east)
+    if len(west) != 0:
+        west = max(west)
+        rook_move_border.append('w' + west)
+
+
+
+    return rook_move_border
+
+
+def rook_final_moves(rook_position, rook_free_moves, piece_borders):
+    rook_final_moves = []
+
+    for border in piece_borders:
+        if border[1] == "0":
+            rook_final_moves.append('x'+border[3:])
+
+    for border in piece_borders:
+        if border[0] == 'n':
+            for move in rook_free_moves:
+                if move[0] == border[3] and move < border[3:] and move > rook_position:
+                    rook_final_moves.append(move)
+
+        elif border[0] == 's':
+            for move in rook_free_moves:
+                if move[0] == border[3] and move > border[3:] and move < rook_position:
+                    rook_final_moves.append(move)
+
+        elif border[0] == 'e':
+            for move in rook_free_moves:
+                if move[1] == border[4] and move < border[3:] and move > rook_position:
+                    rook_final_moves.append(move)
+
+        elif border[0] == 'w':
+            for move in rook_free_moves:
+                if move[1] == border[4] and move > border[3:] and move < rook_position:
+                    rook_final_moves.append(move)
+    sorted(rook_final_moves)
+    return (rook_final_moves)
+
+
+
+rook_free = rook_free_moves(rook_position)
+edges = piece_borders(rook_position,relevant_pieces)
+
+answer = sorted(rook_final_moves(rook_position,rook_free,edges))
+print(answer)
+if len(relevant_pieces) == 0:
+    for i in rook_free:
+        print(f"R{rook_position}-{i}")
+else:
+    for element in answer:
+        if 'x' in element:
+            print(f"R{rook_position}{element}")
+        else:
+            print('R'+rook_position+'-'+element)
